@@ -68,7 +68,7 @@ def display_water_levels(surface, num_levels, pixel_size):
         image = get_water_level_image(surface, water_level, pixel_size)
         display(image)
 
-def display_surface(surface):
+def display_surface(surface, scale=1):
     min_value = np.amin(surface)
     max_value = np.amax(surface)
     diff = max_value - min_value
@@ -86,7 +86,7 @@ def display_surface(surface):
     
     image = Image.fromarray(im_array, mode='L')
     
-    # image = image.resize((200, 200), resample=Image.NEAREST)
+    image = image.resize((width*scale, height*scale), resample=Image.NEAREST)
     
     display(image)
 
@@ -125,6 +125,9 @@ def print_surface(surface, length, width):
         layer = get_layer(surface, length, y)
         print(as_string(layer))
 
+# def print_np_surface(surface):
+    
+
 def all_surface_test():
     side = 4
     print('{}x{} surfaces:'.format(side, side))
@@ -147,11 +150,19 @@ def combine_test():
     print(combine_surface.lengthwise_match(surface_1, surface_2, 2, 2))
     print(combine_surface.lengthwise_stitch(surface_1, surface_2, 2, 2))
 
+def random_surface_test():
+    for _ in range(3):
+        surface = combine_surface.get_random_surface(2)
+        # surface = combine_surface.get_random_double_surface(1)
+        print(surface)
+        print('')
+
 def main():
     # walk_test()
     # surface_test()
     # all_surface_test()
-    combine_test()
+    # combine_test()
+    random_surface_test()
     
 if __name__ == '__main__':
     main()
