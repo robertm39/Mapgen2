@@ -14,6 +14,7 @@ from PIL import Image, ImageDraw
 
 import random_surface
 import enumerate_surface
+import combine_surface
 
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
@@ -139,10 +140,18 @@ def all_surface_test():
     # for top, count in counts_from_tops.items():
     #     print('{}:  {} times'.format(as_string(top), count))
 
+def combine_test():
+    surface_1 = {(0, 0): 0, (1, 0): 1, (0, 1): 1, (1, 1): 2}
+    surface_2 = {(0, 0): 1, (1, 0): 1, (0, 1): 2, (1, 1): 1}
+    
+    print(combine_surface.lengthwise_match(surface_1, surface_2, 2, 2))
+    print(combine_surface.lengthwise_stitch(surface_1, surface_2, 2, 2))
+
 def main():
     # walk_test()
     # surface_test()
-    all_surface_test()
+    # all_surface_test()
+    combine_test()
     
 if __name__ == '__main__':
     main()
