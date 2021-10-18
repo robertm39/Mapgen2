@@ -151,11 +151,12 @@ def combine_test():
     print(combine_surface.lengthwise_stitch(surface_1, surface_2, 2, 2))
 
 def random_surface_test():
-    for _ in range(3):
+    for _ in range(10):
         surface = combine_surface.get_random_surface(2)
         # surface = combine_surface.get_random_double_surface(1)
-        print(surface)
-        print('')
+        display_surface(surface, 10)
+        # print(surface)
+        # print('')
 
 def main():
     # walk_test()

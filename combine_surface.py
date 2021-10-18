@@ -14,6 +14,17 @@ import enumerate_surface
 # Cache all the 4x4 surfaces
 FOUR_BY_FOUR = enumerate_surface.all_surfaces(4, 4)
 
+# Convert into numpy
+# NP_FOUR_BY_FOUR = list()
+# for surface in FOUR_BY_FOUR:
+#     np_surface = np.zeros((4, 4), dtype=np.int32)
+    
+#     for x in range(4):
+#         for y in range(4):
+#             np_surface[x, y] = surface[x, y]
+    
+#     NP_FOUR_BY_FOUR.append(np_surface)
+
 def get_random_four_by_four():
     surface = random.choice(FOUR_BY_FOUR)
     np_surface = np.zeros((4, 4), dtype=np.int32)
@@ -21,6 +32,7 @@ def get_random_four_by_four():
     for x in range(4):
         for y in range(4):
             np_surface[x, y] = surface[x, y]
+    # np_surface = random.choice(NP_FOUR_BY_FOUR)
     
     return np_surface
 
@@ -66,6 +78,14 @@ def lengthwise_compatible(surface_1, surface_2):#, length, width):
     that is, whether adjacent values differ by at most one.
     """
     length, width = surface_1.shape
+    
+    # right_edge = surface_1[length-1, :]
+    # left_edge = surface_2[0, :]
+    
+    # diff = np.abs(right_edge - left_edge)
+    
+    # return np.amax(diff) <= 1
+    
     for y in range(width):
         diff = abs(surface_1[length-1, y] - surface_2[0, y])
         if diff >= 2:
@@ -73,21 +93,30 @@ def lengthwise_compatible(surface_1, surface_2):#, length, width):
     
     return True
 
-def lengthwise_append(surface_1, surface_2):
-    return np.concatenate((surface_1, surface_2), axis=0)
-
 def widthwise_compatible(surface_1, surface_2):
     """
     Return whether the two given surfaces are compatible widthwise,
     that is, whether adjacent values differ by at most one.
     """
     length, width = surface_1.shape
+    
+    # bottom_edge = surface_1[:, width-1]
+    # top_edge = surface_2[:, 0]
+    
+    # diff = np.abs(bottom_edge - top_edge)
+    
+    # return np.amax(diff) <= 1
+    
     for x in range(length):
         diff = abs(surface_1[x, width-1] - surface_2[x, 0])
         if diff >= 2:
             return False
     
     return True
+
+
+def lengthwise_append(surface_1, surface_2):
+    return np.concatenate((surface_1, surface_2), axis=0)
 
 def widthwise_append(surface_1, surface_2):
     return np.concatenate((surface_1, surface_2), axis=1)
@@ -121,6 +150,25 @@ def get_random_surface(num_steps):
             return widthwise_append(subsurface_1, subsurface_2)
         
         # They didn't match, so go again
+        # If the step number is three or more, only resample the second
+        # (maybe I shouldn't actually do this recursively at this level)
+        if num_steps >= 3:
+            while True:
+                subsurface_2 = get_random_double_surface(num_steps)
+                
+                # Get the random displacement
+                displacement = random.randint(-1, 1)
+                
+                # Align the subsurfaces using the displacement
+                _, width = subsurface_1.shape
+                subsurface_2_ul = subsurface_1[0, width-1] + displacement
+                subsurface_2 += subsurface_2_ul
+                
+                # See if the subsurfaces match
+                # if they match, we're done
+                if widthwise_compatible(subsurface_1, subsurface_2):
+                    return widthwise_append(subsurface_1, subsurface_2)
+            
 
 def get_random_double_surface(num_steps):
     # Keep doing this until it works
@@ -144,3 +192,20 @@ def get_random_double_surface(num_steps):
             return lengthwise_append(subsurface_1, subsurface_2)
         
         # They didn't match, so go again
+        # If the step number is three or more, only resample the second
+        if num_steps >= 3:
+            while True:
+                subsurface_2 = get_random_surface(num_steps-1)
+                
+                # Get the random displacement
+                displacement = random.randint(-1, 1)
+                
+                # Align the surfaces using the displacement
+                length, _ = subsurface_1.shape
+                subsurface_2_ul = subsurface_1[length-1, 0] + displacement
+                subsurface_2 += subsurface_2_ul
+                
+                # See whether the subsurfaces match
+                # if they match, we're done
+                if lengthwise_compatible(subsurface_1, subsurface_2):
+                    return lengthwise_append(subsurface_1, subsurface_2)
