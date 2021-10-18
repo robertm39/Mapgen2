@@ -132,7 +132,7 @@ def iter_despin_diffs(l_diffs, w_diffs, num_iters=1, alpha=1/4):
         spins = get_spins(l_diffs, w_diffs)
         
         i += 1
-        if i % 10000 == 0:
+        if i % 1000 == 0:
             norm = np.sqrt(np.mean(spins * spins))
             print('{:6d}: spins norm: {}'.format(i, norm))
         

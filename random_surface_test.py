@@ -161,24 +161,41 @@ def print_surface(surface, length, width):
 #         # print('')
 
 def despin_test():
-    length = 200
-    width = 200
-    scale = 2
+    length = 1000
+    width = 1000
+    scale = 1
     
     l_diffs, w_diffs = despin_gen.random_diffs(length, width)
     
+    # Do the despinning
     l_diffs, w_diffs = despin_gen.iter_despin_diffs(l_diffs,
                                                     w_diffs,
-                                                    num_iters=1*10**5,
-                                                    alpha=0.25)
+                                                    num_iters=50 * 10**3,
+                                                    alpha=0.24)
+    
+    # l_diffs, w_diffs = despin_gen.iter_despin_diffs(l_diffs,
+    #                                                 w_diffs,
+    #                                                 num_iters=5 * 10**3,
+    #                                                 alpha=0.01)
+    
+    # l_diffs, w_diffs = despin_gen.iter_despin_diffs(l_diffs,
+    #                                                 w_diffs,
+    #                                                 num_iters=5 * 10**3,
+    #                                                 alpha=0.02)
+    
+    # l_diffs, w_diffs = despin_gen.iter_despin_diffs(l_diffs,
+    #                                                 w_diffs,
+    #                                                 num_iters=5 * 10**3,
+    #                                                 alpha=0.0025)
     
     surface = despin_gen.get_surface_from_diffs(l_diffs, w_diffs)
     display_surface(surface, scale=scale)
     
     blurred = surface_utils.square_blur(surface)
+    blurred = surface_utils.square_blur(blurred)
     display_surface(blurred, scale=scale)
     
-    display_water_levels(blurred, 10, scale)
+    # display_water_levels(blurred, 10, scale)
 
 def main():
     # walk_test()
