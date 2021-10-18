@@ -8,13 +8,15 @@ Created on Sun Oct 17 14:23:37 2021
 import numpy as np
 import matplotlib.pyplot
 from IPython.display import display
-import random
+# import random
 
 from PIL import Image, ImageDraw
 
 import random_surface
-import enumerate_surface
-import combine_surface
+# import enumerate_surface
+# import combine_surface
+import surface_utils
+import despin_gen
 
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
@@ -128,42 +130,63 @@ def print_surface(surface, length, width):
 # def print_np_surface(surface):
     
 
-def all_surface_test():
-    side = 4
-    print('{}x{} surfaces:'.format(side, side))
-    surfaces = enumerate_surface.all_surfaces(side, side)
-    print('{} surfaces'.format(len(surfaces)))
-    # counts_from_tops = get_layer_counts(surfaces, side)
+# def all_surface_test():
+#     side = 4
+#     print('{}x{} surfaces:'.format(side, side))
+#     surfaces = enumerate_surface.all_surfaces(side, side)
+#     print('{} surfaces'.format(len(surfaces)))
+#     # counts_from_tops = get_layer_counts(surfaces, side)
     
-    for _ in range(5):
-        print('')
-        surface = random.choice(surfaces)
-        print_surface(surface, side, side)
+#     for _ in range(5):
+#         print('')
+#         surface = random.choice(surfaces)
+#         print_surface(surface, side, side)
     
     # for top, count in counts_from_tops.items():
     #     print('{}:  {} times'.format(as_string(top), count))
 
-def combine_test():
-    surface_1 = {(0, 0): 0, (1, 0): 1, (0, 1): 1, (1, 1): 2}
-    surface_2 = {(0, 0): 1, (1, 0): 1, (0, 1): 2, (1, 1): 1}
+# def combine_test():
+#     surface_1 = {(0, 0): 0, (1, 0): 1, (0, 1): 1, (1, 1): 2}
+#     surface_2 = {(0, 0): 1, (1, 0): 1, (0, 1): 2, (1, 1): 1}
     
-    print(combine_surface.lengthwise_match(surface_1, surface_2, 2, 2))
-    print(combine_surface.lengthwise_stitch(surface_1, surface_2, 2, 2))
+#     print(combine_surface.lengthwise_match(surface_1, surface_2, 2, 2))
+#     print(combine_surface.lengthwise_stitch(surface_1, surface_2, 2, 2))
 
-def random_surface_test():
-    for _ in range(10):
-        surface = combine_surface.get_random_surface(2)
-        # surface = combine_surface.get_random_double_surface(1)
-        display_surface(surface, 10)
-        # print(surface)
-        # print('')
+# def random_surface_test():
+#     for _ in range(10):
+#         surface = combine_surface.get_random_surface(2)
+#         # surface = combine_surface.get_random_double_surface(1)
+#         display_surface(surface, 10)
+#         # print(surface)
+#         # print('')
+
+def despin_test():
+    length = 200
+    width = 200
+    scale = 2
+    
+    l_diffs, w_diffs = despin_gen.random_diffs(length, width)
+    
+    l_diffs, w_diffs = despin_gen.iter_despin_diffs(l_diffs,
+                                                    w_diffs,
+                                                    num_iters=1*10**5,
+                                                    alpha=0.25)
+    
+    surface = despin_gen.get_surface_from_diffs(l_diffs, w_diffs)
+    display_surface(surface, scale=scale)
+    
+    blurred = surface_utils.square_blur(surface)
+    display_surface(blurred, scale=scale)
+    
+    display_water_levels(blurred, 10, scale)
 
 def main():
     # walk_test()
     # surface_test()
     # all_surface_test()
     # combine_test()
-    random_surface_test()
+    # random_surface_test()
+    despin_test()
     
 if __name__ == '__main__':
     main()
