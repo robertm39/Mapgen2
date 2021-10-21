@@ -95,15 +95,28 @@ def get_spins(l_diffs, w_diffs):
     
     return l_spin + w_spin
 
-def despin_step(l_diffs, w_diffs, spins, alpha):
+def get_step(spins):
+    length = spins.shape[0] + 1
+    width = spins.shape[1] + 1
+    
+    shifted_spins_1 = np.concatenate((spins[1:, :], np.zeros((1, width-1))), axis=0)
+    shifted_spins_2 = np.concatenate((np.zeros((1, width-1)), spins[:-1, :]), axis=0)
+    
+    shifted_spins_3 = np.concatenate((spins[:, 1:], np.zeros((length-1, 1))), axis=1)
+    shifted_spins_4 = np.concatenate((np.zeros((length-1, 1)), spins[:, :-1]), axis=1)
+    
+    total_shifted = shifted_spins_1 + shifted_spins_2 + shifted_spins_3 + shifted_spins_4
+    mean_shifted = total_shifted / 4
+    
+    return spins + mean_shifted
+    # return -mean_shifted
+
+def despin_step(l_diffs, w_diffs, spins, alpha, prev_step=0, momentum=0):
     width = l_diffs.shape[1]
     length = w_diffs.shape[0]
     
-    spin_inc = spins * alpha
-    
-    # print('l_diffs: {}'.format(l_diffs.shape))
-    # print('2_diffs: {}'.format(w_diffs.shape))
-    # print('spins: {}'.format(spins.shape))
+    # spin_inc = spins * alpha
+    spin_inc = get_step(spins) * alpha + prev_step * momentum
     
     # The spins for w_diffs[x, y]
     # add a column of zeros to end the spins
@@ -125,18 +138,24 @@ def despin_step(l_diffs, w_diffs, spins, alpha):
     padded_spins_4 = np.concatenate((np.zeros((length-1, 1)), spin_inc), axis=1)
     l_diffs = l_diffs - padded_spins_4
     
-    return l_diffs, w_diffs
+    return l_diffs, w_diffs, spin_inc
 
 def iter_despin_diffs(l_diffs, w_diffs, num_iters=1, alpha=1/4):
+    step = 0
     for i in range(num_iters):
         spins = get_spins(l_diffs, w_diffs)
         
         i += 1
-        if i % 1000 == 0:
+        if i % 100 == 0:
             norm = np.sqrt(np.mean(spins * spins))
             print('{:6d}: spins norm: {}'.format(i, norm))
         
-        l_diffs, w_diffs = despin_step(l_diffs, w_diffs, spins, alpha)
+        l_diffs, w_diffs, step = despin_step(l_diffs,
+                                             w_diffs,
+                                             spins,
+                                             alpha,
+                                             prev_step=step,
+                                             momentum=0.99)
     
     spins = get_spins(l_diffs, w_diffs)
     norm = np.sqrt(np.mean(spins * spins))

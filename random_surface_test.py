@@ -170,8 +170,8 @@ def despin_test():
     # Do the despinning
     l_diffs, w_diffs = despin_gen.iter_despin_diffs(l_diffs,
                                                     w_diffs,
-                                                    num_iters=50 * 10**3,
-                                                    alpha=0.24)
+                                                    num_iters=5 * 10**3,
+                                                    alpha=0.75)
     
     # l_diffs, w_diffs = despin_gen.iter_despin_diffs(l_diffs,
     #                                                 w_diffs,
